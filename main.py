@@ -1,6 +1,5 @@
 if __name__ == '__main__':
 
-    import os
     import time
     import aes128
    
@@ -20,7 +19,16 @@ if __name__ == '__main__':
             data_byte_arry_for_xor[i_xor] = data_byte_arry_for_xor[i_xor] ^ Ci[i_xor]
             i_xor = i_xor + 1
         return data_byte_arry_for_xor
-
+    
+    #Adds bytes to the block if the size is less than 16 bytes
+    def block_check_for_min_size(check_block):
+        if 0 < len(check_block) < 16:
+                empty_spaces = 16 - len(check_block)
+                for i in range(empty_spaces - 1):
+                    check_block.append(0)
+                check_block.append(1)
+        #print print_byte_of_array(check_block) + '1'
+        return check_block
 
     
     
@@ -55,60 +63,68 @@ if __name__ == '__main__':
     time_before = time.time()
 
     # Input data
-    m = raw_input()
+    m = raw_input('Input message there: ')
     data = bytearray(m)
     
     #First step cod
-    IV = bytearray('1234525890123456')
+    IV = bytearray('1234525890123445')
     C = IV
+      
     
-    
-    #Adds bytes to the block if the size is less than 16 bytes
-    def block_check_for_min_size(check_block):
-        if 0 < len(check_block) < 16:
-                empty_spaces = 16 - len(check_block)
-                for i in range(empty_spaces - 1):
-                    check_block.append(0)
-                check_block.append(1)
-        return check_block
+    #data = logical_xor(block_check_for_min_size(data),IV)
    
-    
-    data = logical_xor(block_check_for_min_size(data),IV)
-   
-    print print_byte_of_array(data)
+    #print print_byte_of_array(data) +         '   2'
     
     
     
 
     if way == '1':
+        
         crypted_data = []
+        
+        crypted_part = C 
+    
+        
         temp = []
+        i = 1
         for byte in data:
             temp.append(byte)
 	    #print str(len(temp))
             if len(temp) == 16:
-		
-                crypted_part = aes128.encrypt(temp, key)
+
+                if i < 2:
+                    print '1 lap mess == 16'
+                    crypted_part = aes128.encrypt(logical_xor(crypted_part,temp), key)
+                else:
+                    print '2 lap mess == 32'
+                    crypted_part = aes128.encrypt(logical_xor(crypted_part,temp), key)
+ 
+                
+                #crypted_part = aes128.encrypt(temp, key)
                 crypted_data.extend(crypted_part)
+                
+                i = i + 1
                 del temp[:]
         else:
-            #padding v1
-            # crypted_data.extend(temp)
-
-            # padding v2
-            
-            crypted_part = aes128.encrypt(block_check_for_min_size(temp), key)
-            
-		crypted_data.extend(crypted_part)
+            if 0 < len(temp) < 16:
+                empty_spaces = 16 - len(temp)
+                for i in range(empty_spaces - 1):
+                    temp.append(0)
+                temp.append(1)
+                crypted_part = aes128.encrypt(logical_xor(crypted_part,temp), key)
+                crypted_data.extend(crypted_part)
+                print 'mess < 16' 
+                i = i + 1
 
      
 	
     print print_byte_of_array(crypted_data)
+    print crypted_data
     # Ounput data
    
 
 	# if way == '2'
-    if(way == '1'): # if way == '2'
+    if(way == '2'): # if way == '2'
         decrypted_data = []
         temp = []
         for byte in crypted_data:
@@ -135,16 +151,15 @@ if __name__ == '__main__':
 
 
     
-    print print_byte_of_array(decrypted_data)
+    #print print_byte_of_array(decrypted_data)
     
     
     
     #C = bytearray('1234567890123456')
     
-    decrypted_data = logical_xor(decrypted_data,C) 
+    #decrypted_data = logical_xor(decrypted_data,C) 
     
     
-    print print_byte_of_array(decrypted_data)
+    #print print_byte_of_array(decrypted_data)
     
     print 'after XOR'
-
