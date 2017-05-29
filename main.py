@@ -3,7 +3,7 @@ if __name__ == '__main__':
     import time
     import aes128
    
-    
+    print ('h')
     
     def print_byte_of_array(byte_array):
         message_of_array = ''
